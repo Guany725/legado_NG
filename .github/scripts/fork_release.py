@@ -49,6 +49,24 @@ def output(**values):
             stream.write(f"{key}={value}\n")
 
 
+def merge_release(sha, base):
+    # GITHUB_TOKEN cannot write workflow files. Keep this fork's workflow definitions.
+    try:
+        command("git", "merge", "--no-commit", "--no-ff", sha)
+    except subprocess.CalledProcessError:
+        if not Path(command("git", "rev-parse", "--git-path", "MERGE_HEAD")).is_file():
+            raise
+    command("git", "restore", "--source=" + base, "--staged", "--worktree", "--", ".github/workflows")
+    conflicts = command("git", "diff", "--name-only", "--diff-filter=U")
+    if conflicts:
+        with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as stream:
+            stream.write("## Upstream merge needs attention\n\nNo branch or release was updated.\n\n```\n" + conflicts + "\n```\n")
+        command("git", "merge", "--abort")
+        raise RuntimeError("Upstream merge conflicts require manual resolution")
+    if Path(command("git", "rev-parse", "--git-path", "MERGE_HEAD")).is_file():
+        command("git", "commit", "-m", "Merge upstream release; retain fork workflows")
+
+
 def prepare(force=False):
     if os.environ.get("GITHUB_REPOSITORY") != FORK:
         raise RuntimeError("This workflow belongs to " + FORK)
@@ -72,14 +90,7 @@ def prepare(force=False):
     base = command("git", "rev-parse", "HEAD")
     command("git", "config", "user.name", "github-actions[bot]")
     command("git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com")
-    try:
-        command("git", "merge", "--no-edit", sha)
-    except subprocess.CalledProcessError:
-        conflicts = command("git", "diff", "--name-only", "--diff-filter=U")
-        with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as stream:
-            stream.write("## Upstream merge needs attention\n\nNo branch or release was updated.\n\n```\n" + conflicts + "\n```\n")
-        command("git", "merge", "--abort")
-        raise
+    merge_release(sha, base)
     now = dt.datetime.now(dt.timezone(dt.timedelta(hours=8)))
     version = now.strftime("3.%y.%m%d%H")
     # Version names follow NG's hourly update parser. Never replace an existing release.
