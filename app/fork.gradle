@@ -1,0 +1,12 @@
+// Keep fork identity and CI version overrides separate from upstream build settings.
+android {
+    defaultConfig {
+        applicationId 'io.legado.app.ng.guany725'
+        buildConfigField 'String', 'FORK_RELEASE_OWNER', '"Guany725"'
+        if (project.hasProperty('FORK_VERSION_NAME')) versionName project.property('FORK_VERSION_NAME').toString()
+        if (project.hasProperty('FORK_VERSION_CODE')) versionCode project.property('FORK_VERSION_CODE').toString().toInteger()
+    }
+    buildTypes.configureEach {
+        manifestPlaceholders.put('app_name', '阅读 NG 图集')
+    }
+}

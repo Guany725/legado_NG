@@ -71,6 +71,12 @@ class CoverConfigFragment : BaseFragment(R.layout.fragment_cover_config) {
                         onOpenCoverRule = {
                             showDialogFragment(CoverRuleConfigDialog())
                         },
+                        onManageCoverAlbums = {
+                            parentFragmentManager.beginTransaction()
+                                .replace(R.id.configFrameLayout, CoverAlbumManagerFragment())
+                                .addToBackStack("cover-albums")
+                                .commit()
+                        },
                         onUseDefaultCoverChanged = {
                             setBooleanPreference(PreferKey.useDefaultCover, it)
                             refreshCoverPresentation()

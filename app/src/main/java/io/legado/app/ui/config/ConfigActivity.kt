@@ -136,6 +136,7 @@ class ConfigActivity : VMBaseActivity<ActivityConfigBinding, ConfigViewModel>() 
                     intent.getStringExtra("configTag") == ConfigTag.INTERFACE_CONFIG
             is SettingsMenuFragment,
             is CoverConfigFragment,
+            is CoverAlbumManagerFragment,
             is GeneralConfigFragment,
             is StorageConfigFragment,
             is AdvancedConfigFragment,

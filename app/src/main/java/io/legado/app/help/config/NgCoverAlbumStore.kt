@@ -102,6 +102,86 @@ internal object NgCoverAlbumStore {
         return file
     }
 
+    fun create(context: Context, name: String): String = synchronized(lock) {
+        ensureInitialized(context)
+        require(name.trim().length in 1..120) { "图集名称应为 1 至 120 个字符" }
+        val id = UUID.randomUUID().toString()
+        val directory = File(File(context.filesDir, ROOT_DIR), id)
+        check(directory.mkdirs()) { "无法创建图集目录" }
+        try {
+            val album = NgCoverAlbum(id, uniqueName(name, mutableState.value.albums.map { it.name.lowercase() }.toSet()), "", emptyList(), emptyList())
+            publish(context, mutableState.value.copy(albums = mutableState.value.albums + album))
+            id
+        } catch (error: Throwable) {
+            directory.deleteRecursively()
+            throw error
+        }
+    }
+
+    fun rename(context: Context, id: String, name: String) = synchronized(lock) {
+        ensureInitialized(context)
+        require(name.trim().length in 1..120) { "图集名称应为 1 至 120 个字符" }
+        val album = requireNotNull(mutableState.value.albums.find { it.id == id }) { "图集已不存在" }
+        val names = mutableState.value.albums.filterNot { it.id == id }.map { it.name.lowercase() }.toSet()
+        updateAlbum(context, album.copy(name = uniqueName(name, names)))
+    }
+
+    /** Files are staged by the editor; publish only after every copy succeeds. */
+    fun append(context: Context, id: String, dark: Boolean, files: List<File>) = synchronized(lock) {
+        ensureInitialized(context)
+        val album = requireNotNull(mutableState.value.albums.find { it.id == id }) { "图集已不存在" }
+        val directory = requireNotNull(albumDirectory(context, id)) { "图集目录不存在" }
+        val copied = mutableListOf<File>()
+        try {
+            files.forEach { source ->
+                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                BitmapFactory.decodeFile(source.path, bounds)
+                require(bounds.outWidth > 0 && bounds.outHeight > 0) { "图片无法解码" }
+                val extension = source.extension.takeIf { it.matches(Regex("[a-zA-Z0-9]{1,8}")) } ?: "img"
+                val target = File(directory, "${UUID.randomUUID()}.$extension")
+                copied += target
+                source.copyTo(target)
+            }
+            val paths = copied.map { it.absolutePath }
+            updateAlbum(context, if (dark) album.copy(darkImages = album.darkImages + paths)
+                else album.copy(lightImages = album.lightImages + paths))
+        } catch (error: Throwable) {
+            copied.forEach { it.delete() }
+            throw error
+        }
+    }
+
+    fun removeImage(context: Context, id: String, dark: Boolean, path: String) = synchronized(lock) {
+        ensureInitialized(context)
+        val album = requireNotNull(mutableState.value.albums.find { it.id == id }) { "图集已不存在" }
+        val updated = if (dark) album.copy(darkImages = album.darkImages - path)
+            else album.copy(lightImages = album.lightImages - path)
+        updateAlbum(context, updated)
+        if (path !in updated.lightImages && path !in updated.darkImages) {
+            runCatching { packageImage(context, id, path).delete() }
+        }
+    }
+
+    fun copyAppearance(context: Context, id: String, fromDark: Boolean) = synchronized(lock) {
+        ensureInitialized(context)
+        val album = requireNotNull(mutableState.value.albums.find { it.id == id }) { "图集已不存在" }
+        val updated = if (fromDark) album.copy(lightImages = album.darkImages)
+            else album.copy(darkImages = album.lightImages)
+        updateAlbum(context, updated)
+        ((album.lightImages + album.darkImages).toSet() - (updated.lightImages + updated.darkImages).toSet()).forEach {
+            runCatching { packageImage(context, id, it).delete() }
+        }
+    }
+
+    private fun updateAlbum(context: Context, album: NgCoverAlbum) {
+        publish(context, mutableState.value.copy(albums = mutableState.value.albums.map { if (it.id == album.id) album else it }))
+    }
+
+    private fun publish(context: Context, state: NgCoverAlbumLibraryState) {
+        persist(context, state)
+        mutableState.value = state
+    }
+
     fun importFromPackage(
         context: Context,
         packageRoot: File,
@@ -247,6 +327,35 @@ internal object NgCoverAlbumStore {
     internal fun reloadAfterRestore(context: Context) {
         synchronized(lock) { initialized = false }
         ensureInitialized(context)
+        synchronized(lock) {
+            // Backups install shared resources outside album directories. Copy, do not move:
+            // another restored book or theme may still reference the same backup image.
+            val backupRoot = File(context.filesDir, "ng_backup_resources").canonicalFile
+            val libraryRoot = File(context.filesDir, ROOT_DIR).canonicalFile.apply { mkdirs() }
+            val copied = mutableListOf<File>()
+            try {
+                val albums = mutableState.value.albums.map { album ->
+                    val directory = File(libraryRoot, album.id).canonicalFile
+                    require(directory.parentFile == libraryRoot) { "图集目录无效" }
+                    check(directory.isDirectory || directory.mkdirs()) { "无法恢复图集目录" }
+                    val mapping = (album.lightImages + album.darkImages).distinct().associateWith { path ->
+                        val source = File(path).canonicalFile
+                        if (source.isFile && source.toPath().startsWith(backupRoot.toPath())) {
+                            val target = File(directory, "${UUID.randomUUID()}.img")
+                            copied += target
+                            source.copyTo(target)
+                            target.absolutePath
+                        } else path
+                    }
+                    album.copy(lightImages = album.lightImages.map { mapping.getValue(it) },
+                        darkImages = album.darkImages.map { mapping.getValue(it) })
+                }
+                if (albums != mutableState.value.albums) publish(context, mutableState.value.copy(albums = albums))
+            } catch (error: Throwable) {
+                copied.forEach { it.delete() }
+                throw error
+            }
+        }
     }
 
     private fun ensureInitialized(context: Context) {
