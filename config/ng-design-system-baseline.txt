@@ -28,3 +28,6 @@ theme_store|app/src/main/java/io/legado/app/ui/widget/text/TextInputLayout.kt|2
 visual_boolean|app/src/main/java/io/legado/app/ui/widget/text/AccentStrokeTextView.kt|3
 visual_boolean|app/src/main/res/layout/fragment_ai_config.xml|2
 visual_boolean|app/src/main/res/layout/fragment_tts_engine_config.xml|3
+# Existing upstream occurrences at 7ee6fed; keep enforcing the gate for new code.
+hex|app/src/main/java/io/legado/app/ui/book/info/BookInfoActivity.kt|1
+visual_boolean|app/src/main/java/io/legado/app/ui/widget/image/AccentStrokeImageButton.kt|4
