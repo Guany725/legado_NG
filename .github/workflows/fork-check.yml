@@ -20,7 +20,7 @@ jobs:
       - run: python3 .github/scripts/test_fork_release.py
       - run: |
           chmod +x gradlew
-          ./gradlew :app:verifyNgDesignSystem :app:testAppDebugUnitTest --tests '*NgCoverAlbumStoreTest' --tests '*AppUpdateReleaseTest' --tests '*NgContentThemePackageTest' --tests '*NgThemeDrawerPackageTest' --stacktrace
+          ./gradlew -PFORK_FOCUSED_TESTS :app:verifyNgDesignSystem :app:testAppDebugUnitTest --tests '*NgCoverAlbumStoreTest' --tests '*AppUpdateReleaseTest' --tests '*NgContentThemePackageTest' --tests '*NgThemeDrawerPackageTest' --stacktrace
       - uses: actions/upload-artifact@v7
         if: always()
         with:

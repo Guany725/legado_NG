@@ -8,7 +8,7 @@
 
 ## GitHub 自动构建
 
-- `Fork - Album checks` 在 PR 中运行设计规范检查和相关单元测试。
+- `Fork - Album checks` 在 PR 中运行设计规范检查和相关单元测试。由于当前上游其他单元测试存在编译错误，使用 `-PFORK_FOCUSED_TESTS` 仅编译图集、主题包、更新校验四个测试类及其 fixture；这不是全仓测试通过。普通开发构建不受该选项影响。
 - `Fork - Follow upstream release` 每小时第 17 分钟检查上游最新稳定 Release。GitHub 调度可能延迟，fork 首次使用需在 Actions 页面启用工作流。
 - 只合并上游已发布的 tag，不跟随上游 main 的未发布提交。保留本 fork 的 `.github/workflows`，上游工作流变更须人工评估同步（默认 GitHub 令牌不能写入工作流文件）。先在临时候选提交上测试和构建，成功后才更新 main 并发布签名 APK。
 - 合并冲突、测试失败、签名缺失或构建失败均停止发布。构建期间 main 有新提交也会停止，避免覆盖修改。

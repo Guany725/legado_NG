@@ -73,7 +73,7 @@ jobs:
         run: |
           python3 .github/scripts/test_fork_release.py
           chmod +x gradlew
-          ./gradlew :app:verifyNgDesignSystem :app:testAppDebugUnitTest --tests '*NgCoverAlbumStoreTest' --tests '*AppUpdateReleaseTest' --tests '*NgContentThemePackageTest' --tests '*NgThemeDrawerPackageTest' --stacktrace
+          ./gradlew -PFORK_FOCUSED_TESTS :app:verifyNgDesignSystem :app:testAppDebugUnitTest --tests '*NgCoverAlbumStoreTest' --tests '*AppUpdateReleaseTest' --tests '*NgContentThemePackageTest' --tests '*NgThemeDrawerPackageTest' --stacktrace
           ./gradlew :app:assembleAppRelease -PUPDATE_CHANNEL=official --stacktrace
           mkdir -p apk
           mapfile -t files < <(find app/build/outputs/apk/app/release -name '*.apk')
