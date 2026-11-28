@@ -1,6 +1,8 @@
 name: Fork - Follow upstream release
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:

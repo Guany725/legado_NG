@@ -84,10 +84,10 @@ def prepare(force=False):
         raise ValueError("Invalid commit SHA")
     state = json.loads(STATE.read_text()) if STATE.exists() else {}
     published = api(f"repos/{FORK}/releases/tags/{state['fork_tag']}") if re.fullmatch(r"3\.\d{2}\.\d{6}", state.get("fork_tag", "")) else None
-    if not force and release_is_current(state, upstream, sha, published):
+    base = command("git", "rev-parse", "HEAD")
+    if not force and release_is_current(state, upstream, sha, published) and published.get("target_commitish") == base:
         output(changed="false")
         return
-    base = command("git", "rev-parse", "HEAD")
     command("git", "config", "user.name", "github-actions[bot]")
     command("git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com")
     merge_release(sha, base)

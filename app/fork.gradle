@@ -13,13 +13,11 @@ android {
 
 // Upstream's unrelated unit tests currently do not compile; CI validates this feature's suite.
 if (project.hasProperty('FORK_FOCUSED_TESTS')) {
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-        if (name.endsWith('UnitTestKotlin')) {
+    tasks.matching { it.name.endsWith('UnitTestKotlin') }.configureEach {
             setSource(fileTree('src/test/java') {
                 include '**/NgCoverAlbumStoreTest.kt', '**/AppUpdateReleaseTest.kt',
                         '**/NgContentThemePackageTest.kt', '**/NgThemeDrawerPackageTest.kt',
                         '**/NgThemeTestFixtures.kt'
             })
-        }
     }
 }
