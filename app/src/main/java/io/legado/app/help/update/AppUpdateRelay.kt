@@ -1,5 +1,6 @@
 package io.legado.app.help.update
 
+import io.legado.app.BuildConfig
 import io.legado.app.help.http.GitHubRelay
 
 import java.io.InputStream
@@ -10,7 +11,7 @@ import java.security.MessageDigest
 internal object AppUpdateRelay {
 
     private const val STREAM_DOWNLOAD_URL = "https://download.githubcdn.com?url="
-    private const val RELEASE_OWNER = "joestar817"
+    private const val RELEASE_OWNER = BuildConfig.FORK_RELEASE_OWNER
     private const val RELEASE_REPOSITORY = "legado_NG"
 
     fun apiCandidates(gitHubUrl: String): List<String> {

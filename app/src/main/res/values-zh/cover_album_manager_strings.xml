@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="album_manager_title">管理封面图集</string>
+    <string name="album_manager_summary">新建图集、添加图片、独立导入导出</string>
+    <string name="album_manager_hint">图集独立保存在本机。这里导入独立图集 ZIP；主题 ZIP 请在主题管理中导入。图集 ZIP 及解压内容上限 512 MiB，单图上限 32 MiB。</string>
+    <string name="album_create">新建图集</string>
+    <string name="album_import">导入图集</string>
+    <string name="album_export">导出图集</string>
+    <string name="album_name">图集名称</string>
+    <string name="album_rename">重命名</string>
+    <string name="album_use">使用此图集</string>
+    <string name="album_in_use">使用中</string>
+    <string name="album_back">返回图集列表</string>
+    <string name="album_empty">还没有图集，点击新建或导入。</string>
+    <string name="album_no_images">此模式还没有图片。</string>
+    <string name="album_add_images">多选添加图片</string>
+    <string name="album_optimize">压缩新图片（长边不超过 1600 像素）</string>
+    <string name="album_copy_appearance">同步到另一日夜模式</string>
+    <string name="album_copy_confirm">用当前图片替换另一日夜模式的图片？</string>
+    <string name="album_delete_image_confirm">从当前日夜模式移除这张图片？</string>
+    <string name="album_delete">删除整个图集</string>
+    <string name="album_preview">封面预览</string>
+    <string name="album_operation_complete">操作完成</string>
+</resources>

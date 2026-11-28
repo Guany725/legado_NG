@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="album_manager_title">Manage cover albums</string>
+    <string name="album_manager_summary">Create albums, add pictures, import or export</string>
+    <string name="album_manager_hint">Albums are stored locally. Import standalone album ZIPs here; import theme ZIPs in Theme management. ZIP and unpacked contents: up to 512 MiB; each image: 32 MiB.</string>
+    <string name="album_create">New album</string>
+    <string name="album_import">Import ZIP</string>
+    <string name="album_export">Export ZIP</string>
+    <string name="album_name">Album name</string>
+    <string name="album_rename">Rename</string>
+    <string name="album_use">Use this album</string>
+    <string name="album_in_use">Selected</string>
+    <string name="album_back">All albums</string>
+    <string name="album_empty">No albums yet. Create one or import a ZIP.</string>
+    <string name="album_no_images">No pictures in this appearance.</string>
+    <string name="album_add_images">Add pictures</string>
+    <string name="album_optimize">Optimize new images (long edge up to 1600 px)</string>
+    <string name="album_copy_appearance">Copy to the other appearance</string>
+    <string name="album_copy_confirm">Replace the other appearance with these pictures?</string>
+    <string name="album_delete_image_confirm">Remove this picture from this appearance?</string>
+    <string name="album_delete">Delete album</string>
+    <string name="album_preview">Cover preview</string>
+    <string name="album_operation_complete">Done</string>
+</resources>

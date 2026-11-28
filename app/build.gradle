@@ -457,3 +457,6 @@ tasks.matching { it.name == "installAppDebug" }.configureEach {
     dependsOn("installAppDebugStreaming")
     enabled = false
 }
+
+
+apply from: 'fork.gradle'

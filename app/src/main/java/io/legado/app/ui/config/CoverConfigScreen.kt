@@ -78,7 +78,8 @@ internal fun CoverConfigScreen(
     onDayShowAuthorChanged: (Boolean) -> Unit,
     onOpenNightCover: () -> Unit,
     onNightShowNameChanged: (Boolean) -> Unit,
-    onNightShowAuthorChanged: (Boolean) -> Unit
+    onNightShowAuthorChanged: (Boolean) -> Unit,
+    onManageCoverAlbums: () -> Unit = {},
 ) {
     var showCoverAlbumSelector by remember { mutableStateOf(false) }
     var pendingDeleteAlbum by remember { mutableStateOf<NgCoverAlbum?>(null) }
@@ -119,6 +120,12 @@ internal fun CoverConfigScreen(
                 summary = state.coverAlbumSummary,
                 enabled = state.coverAlbums.isNotEmpty(),
                 onClick = { showCoverAlbumSelector = true }
+            )
+            NgCompactSettingsDivider()
+            NgCompactSettingsItem(
+                title = stringResource(R.string.album_manager_title),
+                summary = stringResource(R.string.album_manager_summary),
+                onClick = onManageCoverAlbums,
             )
         }
 
